@@ -1,39 +1,50 @@
-from flask import Flask, render_template, jsonify, request
-import sudoku_logic
+from flask import Flask, render_template, request, jsonify, session
+from sudoku import generate_puzzle, DIFFICULTY_CLUES
+import os, random
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
-# Keep a simple in-memory store for current puzzle and solution
-CURRENT = {
-    'puzzle': None,
-    'solution': None
-}
-
-@app.route('/')
+@app.route("/")
 def index():
-    return render_template('index.html')
+    return render_template("index.html", difficulties=list(DIFFICULTY_CLUES.keys()))
 
-@app.route('/new')
+@app.route("/api/new_game", methods=["POST"])
 def new_game():
-    clues = int(request.args.get('clues', 35))
-    puzzle, solution = sudoku_logic.generate_puzzle(clues)
-    CURRENT['puzzle'] = puzzle
-    CURRENT['solution'] = solution
-    return jsonify({'puzzle': puzzle})
+    difficulty = request.get_json().get("difficulty", "medium")
+    puzzle, solution = generate_puzzle(difficulty)
+    session["solution"] = solution
+    session["puzzle"] = puzzle
+    return jsonify({"puzzle": puzzle, "difficulty": difficulty})
 
-@app.route('/check', methods=['POST'])
-def check_solution():
-    data = request.json
-    board = data.get('board')
-    solution = CURRENT.get('solution')
-    if solution is None:
-        return jsonify({'error': 'No game in progress'}), 400
-    incorrect = []
-    for i in range(sudoku_logic.SIZE):
-        for j in range(sudoku_logic.SIZE):
-            if board[i][j] != solution[i][j]:
-                incorrect.append([i, j])
-    return jsonify({'incorrect': incorrect})
+@app.route("/api/check", methods=["POST"])
+def check():
+    board = request.get_json().get("board")
+    solution = session.get("solution")
+    if not solution:
+        return jsonify({"error": "No active game"}), 400
+    errors, solved = [], True
+    for r in range(9):
+        for c in range(9):
+            v = board[r][c]
+            if v == 0:
+                solved = False
+            elif v != solution[r][c]:
+                errors.append([r, c])
+                solved = False
+    return jsonify({"errors": errors, "solved": solved})
 
-if __name__ == '__main__':
+@app.route("/api/hint", methods=["POST"])
+def hint():
+    board = request.get_json().get("board")
+    solution = session.get("solution")
+    if not solution:
+        return jsonify({"error": "No active game"}), 400
+    empty = [(r, c) for r in range(9) for c in range(9) if board[r][c] == 0]
+    if not empty:
+        return jsonify({"hint": None})
+    r, c = random.choice(empty)
+    return jsonify({"hint": {"row": r, "col": c, "value": solution[r][c]}})
+
+if __name__ == "__main__":
     app.run(debug=True)
