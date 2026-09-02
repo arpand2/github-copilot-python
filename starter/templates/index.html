@@ -1,39 +1,46 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sudoku</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-  <header>
-    <h1>Sudoku</h1>
-    <button id="theme-toggle" aria-label="Toggle dark mode">🌙</button>
-  </header>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sudoku</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="game-panel" aria-label="Sudoku game panel">
+        <header class="toolbar">
+          <div class="brand-block">
+            <span class="brand-mark">GridLogic</span>
+            <h1 class="app-title">Sudoku Sprint</h1>
+          </div>
 
-  <section class="controls">
-    <label for="difficulty">Difficulty</label>
-    <select id="difficulty">
-      <option value="easy">Easy</option>
-      <option value="medium" selected>Medium</option>
-      <option value="hard">Hard</option>
-    </select>
-    <button id="new-game">New Game</button>
-    <button id="hint-btn">Hint</button>
-    <button id="check-btn">Check</button>
-    <span id="timer">00:00</span>
-  </section>
+          <label for="difficulty-select" class="difficulty-label">Difficulty</label>
+          <select id="difficulty-select" class="difficulty-select" aria-label="Select difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+          </select>
 
-  <div id="board" class="sudoku-board" role="grid" aria-label="Sudoku board"></div>
+          <button id="new-game-btn" class="action-btn" type="button">New Round</button>
+          <button id="check-btn" class="action-btn secondary" type="button">Validate</button>
+          <button id="hint-btn" class="action-btn tertiary" type="button">Reveal One</button>
 
-  <p id="message" role="status"></p>
+          <div id="timer-display" class="timer-display" aria-live="polite">00:00</div>
+        </header>
 
-  <section class="leaderboard">
-    <h2>Top 10 Fastest Times</h2>
-    <ol id="leaderboard-list"></ol>
-  </section>
+        <div id="sudoku-grid" class="sudoku-grid" role="grid" aria-label="Sudoku board"></div>
+        <p id="status-message" class="status-message" aria-live="polite"></p>
+      </section>
 
-  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
+      <aside class="scoreboard-panel" aria-label="Leaderboard panel">
+        <h2 class="scoreboard-title">Top 10 Times</h2>
+        <p class="best-score-label">Best Time</p>
+        <p id="best-score-display" class="best-score-display">No score yet</p>
+        <ol id="scoreboard-list" class="scoreboard-list"></ol>
+      </aside>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
 </html>

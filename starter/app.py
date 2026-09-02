@@ -1,50 +1,62 @@
-from flask import Flask, render_template, request, jsonify, session
-from sudoku import generate_puzzle, DIFFICULTY_CLUES
-import os, random
+from flask import Flask, jsonify, render_template, request
+
+from sudoku import generate_puzzle
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key-change-me")
 
-@app.route("/")
+VALID_DIFFICULTIES = {"easy", "medium", "hard"}
+
+
+@app.get("/")
 def index():
-    return render_template("index.html", difficulties=list(DIFFICULTY_CLUES.keys()))
+    return render_template("index.html")
 
-@app.route("/api/new_game", methods=["POST"])
+
+@app.post("/new_game")
+@app.post("/api/new_game")
 def new_game():
-    difficulty = request.get_json().get("difficulty", "medium")
+    payload = request.get_json(silent=True) or {}
+    difficulty = (payload.get("difficulty") or "medium").lower()
+
+    if difficulty not in VALID_DIFFICULTIES:
+        return jsonify({"error": "Invalid difficulty. Choose easy, medium, or hard."}), 400
+
     puzzle, solution = generate_puzzle(difficulty)
-    session["solution"] = solution
-    session["puzzle"] = puzzle
-    return jsonify({"puzzle": puzzle, "difficulty": difficulty})
+    return jsonify({"puzzle": puzzle, "solution": solution})
 
-@app.route("/api/check", methods=["POST"])
+
+@app.post("/check")
+@app.post("/api/check")
 def check():
-    board = request.get_json().get("board")
-    solution = session.get("solution")
-    if not solution:
-        return jsonify({"error": "No active game"}), 400
-    errors, solved = [], True
-    for r in range(9):
-        for c in range(9):
-            v = board[r][c]
-            if v == 0:
-                solved = False
-            elif v != solution[r][c]:
-                errors.append([r, c])
-                solved = False
-    return jsonify({"errors": errors, "solved": solved})
+    payload = request.get_json(silent=True) or {}
+    board = payload.get("board")
+    solution = payload.get("solution")
 
-@app.route("/api/hint", methods=["POST"])
-def hint():
-    board = request.get_json().get("board")
-    solution = session.get("solution")
-    if not solution:
-        return jsonify({"error": "No active game"}), 400
-    empty = [(r, c) for r in range(9) for c in range(9) if board[r][c] == 0]
-    if not empty:
-        return jsonify({"hint": None})
-    r, c = random.choice(empty)
-    return jsonify({"hint": {"row": r, "col": c, "value": solution[r][c]}})
+    if not isinstance(board, list) or len(board) != 9:
+        return jsonify({"error": "Board must be a 9x9 grid."}), 400
+
+    if not isinstance(solution, list) or len(solution) != 9:
+        return jsonify({"error": "Solution must be a 9x9 grid."}), 400
+
+    correct = []
+    incorrect = []
+
+    for row_index, row in enumerate(board):
+        if not isinstance(row, list) or len(row) != 9:
+            return jsonify({"error": "Each row must contain 9 values."}), 400
+
+        for col_index, value in enumerate(row):
+            if value == 0:
+                continue
+
+            if value == solution[row_index][col_index]:
+                correct.append([row_index, col_index])
+            else:
+                incorrect.append([row_index, col_index])
+
+    solved = not incorrect and all(value != 0 for row in board for value in row)
+    return jsonify({"correct": correct, "incorrect": incorrect, "solved": solved})
+
 
 if __name__ == "__main__":
     app.run(debug=True)

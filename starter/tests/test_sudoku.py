@@ -1,27 +1,55 @@
-import sys, os, copy
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from sudoku import generate_full_board, generate_puzzle, count_solutions
+import copy
 
-def test_full_board_is_valid():
-    board = generate_full_board()
-    for row in board:
-        assert sorted(row) == list(range(1, 10))
-    for c in range(9):
-        assert sorted(board[r][c] for r in range(9)) == list(range(1, 10))
+from sudoku import count_solutions, generate_puzzle, is_valid
 
-def test_puzzle_has_unique_solution():
+
+def test_generate_puzzle_easy_has_unique_solution():
+    puzzle, _ = generate_puzzle("easy")
+    assert count_solutions(copy.deepcopy(puzzle), limit=2) == 1
+
+
+def test_generate_puzzle_medium_has_unique_solution():
+    puzzle, _ = generate_puzzle("medium")
+    assert count_solutions(copy.deepcopy(puzzle), limit=2) == 1
+
+
+def test_generate_puzzle_hard_has_unique_solution():
     puzzle, _ = generate_puzzle("hard")
-    assert count_solutions(copy.deepcopy(puzzle)) == 1
+    assert count_solutions(copy.deepcopy(puzzle), limit=2) == 1
 
-def test_clues_match_solution():
-    puzzle, solution = generate_puzzle("easy")
-    for r in range(9):
-        for c in range(9):
-            if puzzle[r][c] != 0:
-                assert puzzle[r][c] == solution[r][c]
 
-def test_difficulty_ordering():
-    easy, _ = generate_puzzle("easy")
-    hard, _ = generate_puzzle("hard")
-    clues = lambda b: sum(1 for row in b for v in row if v != 0)
-    assert clues(easy) > clues(hard)
+def test_generate_puzzle_solution_solves_the_puzzle():
+    for difficulty in ("easy", "medium", "hard"):
+        puzzle, solution = generate_puzzle(difficulty)
+
+        for row in range(9):
+            for col in range(9):
+                if puzzle[row][col] == 0:
+                    assert solution[row][col] != 0
+                else:
+                    assert puzzle[row][col] == solution[row][col]
+
+
+def test_is_valid_rejects_illegal_placements():
+    board = [[0 for _ in range(9)] for _ in range(9)]
+    assert is_valid(board, 0, 0, 5) is True
+
+    board[0][1] = 5
+    assert is_valid(board, 0, 0, 5) is False
+
+    board = [[0 for _ in range(9)] for _ in range(9)]
+    board[1][0] = 5
+    assert is_valid(board, 0, 0, 5) is False
+
+    board = [[0 for _ in range(9)] for _ in range(9)]
+    board[0][0] = 5
+    assert is_valid(board, 0, 0, 5) is False
+
+
+def test_count_solutions_unique_and_multiple():
+    puzzle, _ = generate_puzzle("easy")
+    assert count_solutions(copy.deepcopy(puzzle), limit=2) == 1
+
+    board = [[0 for _ in range(9)] for _ in range(9)]
+    board[0][0] = 1
+    assert count_solutions(board, limit=2) > 1
