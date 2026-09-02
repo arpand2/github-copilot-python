@@ -46,10 +46,7 @@ def check():
             return jsonify({"error": "Each row must contain 9 values."}), 400
 
         for col_index, value in enumerate(row):
-            if value == 0:
-                continue
-
-            if value == solution[row_index][col_index]:
+            if value != 0 and value == solution[row_index][col_index]:
                 correct.append([row_index, col_index])
             else:
                 incorrect.append([row_index, col_index])

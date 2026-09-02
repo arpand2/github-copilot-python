@@ -9,34 +9,27 @@
   <body>
     <main class="app-shell">
       <section class="game-panel" aria-label="Sudoku game panel">
-        <header class="toolbar">
-          <div class="brand-block">
-            <span class="brand-mark">GridLogic</span>
-            <h1 class="app-title">Sudoku Sprint</h1>
-          </div>
-
+        <h1 class="app-title">Sudoku Game</h1>
+        <div id="sudoku-grid" class="sudoku-grid" role="grid" aria-label="Sudoku board"></div>
+        <div class="controls" aria-label="Game controls">
           <label for="difficulty-select" class="difficulty-label">Difficulty</label>
           <select id="difficulty-select" class="difficulty-select" aria-label="Select difficulty">
             <option value="easy">Easy</option>
             <option value="medium" selected>Medium</option>
             <option value="hard">Hard</option>
           </select>
-
-          <button id="new-game-btn" class="action-btn" type="button">New Round</button>
-          <button id="check-btn" class="action-btn secondary" type="button">Validate</button>
-          <button id="hint-btn" class="action-btn tertiary" type="button">Reveal One</button>
-
-          <div id="timer-display" class="timer-display" aria-live="polite">00:00</div>
-        </header>
-
-        <div id="sudoku-grid" class="sudoku-grid" role="grid" aria-label="Sudoku board"></div>
+          <button id="new-game-btn" class="action-btn" type="button">New Game</button>
+          <button id="hint-btn" class="action-btn tertiary" type="button">Hint</button>
+          <button id="check-btn" class="action-btn secondary" type="button">Check Puzzle</button>
+          <button id="theme-toggle" class="action-btn theme-toggle" type="button" aria-label="Toggle dark mode">Dark Mode</button>
+          <div id="timer-display" class="timer-display" aria-live="polite">Time: 00:00</div>
+        </div>
         <p id="status-message" class="status-message" aria-live="polite"></p>
       </section>
 
       <aside class="scoreboard-panel" aria-label="Leaderboard panel">
         <div class="leaderboard-header">
           <h2 class="scoreboard-title">Top 10 Times</h2>
-          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">🌙</button>
         </div>
 
         <p class="best-score-label">Best Time</p>

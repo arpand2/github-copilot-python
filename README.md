@@ -1,6 +1,16 @@
-# Refactor a Sudoku Game written in Python Flask
+# GridLogic Sudoku Challenge
 
-Use this simple Sudoku game as a starting point to practice your skills with GitHub Copilot. The goal is to refactor the code to use modern technologies, while also adding new features and improving the overall user experience.
+Built with GitHub Copilot.
+
+This project is a compact Python Flask Sudoku app for generating valid logic puzzles, checking uniqueness, timing the solve, and recording leaderboard entries in the browser. It keeps the game logic separate from the Flask routes and frontend code so the project stays easy to maintain.
+
+## Features
+- Creates valid Easy, Medium, and Hard Sudoku boards with exactly one solution
+- Uses recursive backtracking to validate board states and count possible completions
+- Tracks live solve time and validates user input as the game progresses
+- Includes a hint system that counts usage and stores it with each saved score
+- Keeps a top-10 scoreboard in localStorage for persistent results across refreshes
+- Separates Sudoku logic, app routes, styling, and browser behavior into clean modules
 
 ## Getting Started
 
@@ -58,3 +68,12 @@ Use GitHub Copilot to refactor the code for this game to add more advanced featu
 - The game should be responsive and work well on both desktop and mobile devices.
 - UI colors should be visually appealing and accessible.
 - Completed and correct puzzles should display a congratulatory message with the time taken and hints used and ask for the user's name for Top 10 times.
+
+## Running Tests
+source .venv/bin/activate
+pip install -r requirements.txt
+pytest -v
+
+## Running the App
+python app.py
+# visit http://127.0.0.1:5000

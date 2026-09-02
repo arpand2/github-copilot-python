@@ -110,7 +110,7 @@ function createCell(rowIndex, colIndex, value, isReadOnly) {
   const boxCol = Math.floor(colIndex / 3);
   const blockOffset = (boxRow * 3 + boxCol) % 2;
   if (blockOffset === 0) {
-    cell.style.background = "#f8fafc";
+    cell.classList.add("cell-alt");
   }
 
   if (isReadOnly) {
@@ -250,12 +250,12 @@ themeToggleButton.addEventListener("click", () => {
   const nextTheme = currentTheme === "dark" ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", nextTheme);
   localStorage.setItem("sudoku_theme", nextTheme);
-  themeToggleButton.textContent = nextTheme === "dark" ? "☀️" : "🌙";
+  themeToggleButton.textContent = nextTheme === "dark" ? "Light Mode" : "Dark Mode";
 });
 
 const savedTheme = localStorage.getItem("sudoku_theme") || "light";
 document.documentElement.setAttribute("data-theme", savedTheme);
-themeToggleButton.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+themeToggleButton.textContent = savedTheme === "dark" ? "Light Mode" : "Dark Mode";
 
 renderLeaderboard();
 fetchNewGame();
