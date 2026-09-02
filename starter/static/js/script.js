@@ -9,6 +9,7 @@ const timerElement = document.getElementById("timer-display");
 const statusElement = document.getElementById("status-message");
 const leaderboardList = document.getElementById("scoreboard-list");
 const bestScoreDisplay = document.getElementById("best-score-display");
+const themeToggleButton = document.getElementById("theme-toggle");
 
 let board = [];
 let solution = [];
@@ -62,20 +63,28 @@ function renderLeaderboard() {
 
   if (!entries.length) {
     bestScoreDisplay.textContent = "No score yet";
-    const item = document.createElement("li");
-    item.textContent = "No scores yet";
-    leaderboardList.appendChild(item);
+    leaderboardList.innerHTML = `
+      <tr>
+        <td colspan="5">No scores yet</td>
+      </tr>
+    `;
     return;
   }
 
   const bestEntry = entries[0];
   bestScoreDisplay.textContent = `${bestEntry.name} — ${formatTime(bestEntry.time)} — ${bestEntry.difficulty}`;
 
-  entries.forEach((entry) => {
-    const item = document.createElement("li");
-    const hintsText = entry.hintsUsed !== undefined ? ` — ${entry.hintsUsed} hint${entry.hintsUsed === 1 ? "" : "s"}` : "";
-    item.textContent = `${entry.name} — ${formatTime(entry.time)}${hintsText} — ${entry.difficulty}`;
-    leaderboardList.appendChild(item);
+  entries.forEach((entry, index) => {
+    const row = document.createElement("tr");
+    const hintsText = entry.hintsUsed !== undefined ? entry.hintsUsed : 0;
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${entry.name}</td>
+      <td>${formatTime(entry.time)}</td>
+      <td>${entry.difficulty}</td>
+      <td>${hintsText}</td>
+    `;
+    leaderboardList.appendChild(row);
   });
 }
 
@@ -236,6 +245,17 @@ newGameButton.addEventListener("click", fetchNewGame);
 checkButton.addEventListener("click", checkBoard);
 hintButton.addEventListener("click", useHint);
 difficultySelect.addEventListener("change", fetchNewGame);
+themeToggleButton.addEventListener("click", () => {
+  const currentTheme = document.documentElement.getAttribute("data-theme");
+  const nextTheme = currentTheme === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", nextTheme);
+  localStorage.setItem("sudoku_theme", nextTheme);
+  themeToggleButton.textContent = nextTheme === "dark" ? "☀️" : "🌙";
+});
+
+const savedTheme = localStorage.getItem("sudoku_theme") || "light";
+document.documentElement.setAttribute("data-theme", savedTheme);
+themeToggleButton.textContent = savedTheme === "dark" ? "☀️" : "🌙";
 
 renderLeaderboard();
 fetchNewGame();

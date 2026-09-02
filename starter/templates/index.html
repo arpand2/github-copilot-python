@@ -34,10 +34,26 @@
       </section>
 
       <aside class="scoreboard-panel" aria-label="Leaderboard panel">
-        <h2 class="scoreboard-title">Top 10 Times</h2>
+        <div class="leaderboard-header">
+          <h2 class="scoreboard-title">Top 10 Times</h2>
+          <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">🌙</button>
+        </div>
+
         <p class="best-score-label">Best Time</p>
         <p id="best-score-display" class="best-score-display">No score yet</p>
-        <ol id="scoreboard-list" class="scoreboard-list"></ol>
+
+        <table class="scoreboard-table" aria-label="Top 10 leaderboard table">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>Time</th>
+              <th>Difficulty</th>
+              <th>Hints</th>
+            </tr>
+          </thead>
+          <tbody id="scoreboard-list"></tbody>
+        </table>
       </aside>
     </main>
 
